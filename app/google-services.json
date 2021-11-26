@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "674020388282",
+    "firebase_url": "https://gelgel-short-time-coding-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "gelgel-short-time-coding",
+    "storage_bucket": "gelgel-short-time-coding.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:674020388282:android:51bffb96f1279bbc32c183",
+        "android_client_info": {
+          "package_name": "com.example.gelgel_short_time_coding"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "674020388282-io8f7i6ejq0rab1rp5itctn87g6ajqhf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gelgel_short_time_coding",
+            "certificate_hash": "6cfbb2bba962295c533603127e3c389ace65055b"
+          }
+        },
+        {
+          "client_id": "674020388282-5pml9ddjimfkg0snl5t8duerk0konkm9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIUbWvGMXFC_2c7hJjAize-zItXqzsRlI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "674020388282-5pml9ddjimfkg0snl5t8duerk0konkm9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
