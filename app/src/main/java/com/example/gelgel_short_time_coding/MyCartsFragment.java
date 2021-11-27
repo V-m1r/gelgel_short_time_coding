@@ -110,18 +110,18 @@ public class MyCartsFragment extends Fragment {
                         String documentId = documentSnapshot.getId();
 
                         MyCartModel cartModel = documentSnapshot.toObject(MyCartModel.class);
-                        sb.append(documentId + "\n" + cartModel.toString());
+
                         cartModel.setDocumentId(documentId);
 
                         cartModelsList.add(cartModel);
                         cartAdapter.notifyDataSetChanged();
-
+                        sb.append("ProductID: "+documentId + "\n" + cartModel.toString());
                         progressBar.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
 
                     calculateTotalAmount(cartModelsList);
-                    sb.append("\n"+overTotalAmount.getText().toString());
+                    sb.append("\nTotalPrice: "+overTotalAmount.getText().toString());
 
                 }
             }
