@@ -37,7 +37,6 @@
         android:id="@+id/phoneAuth"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:background="@drawable/edittext_background"
         android:drawableLeft="@drawable/ic_baseline_local_phone_24"
         android:drawablePadding="13dp"
@@ -45,6 +44,23 @@
         android:hint="Telefon Nomer"
         android:inputType="phone"
         android:padding="13dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_reg"
+        app:layout_constraintWidth_percent=".8" />
+
+    <EditText
+        android:id="@+id/email_reg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:drawableLeft="@drawable/ic_baseline_local_phone_24"
+        android:drawablePadding="13dp"
+        android:elevation="3dp"
+        android:hint="Email"
+        android:inputType="phone"
+        android:padding="13dp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name"
