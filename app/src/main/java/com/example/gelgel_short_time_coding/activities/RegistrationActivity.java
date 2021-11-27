@@ -17,22 +17,27 @@ import android.widget.Toast;
 
 import com.example.gelgel_short_time_coding.MainActivity;
 import com.example.gelgel_short_time_coding.R;
+import com.example.gelgel_short_time_coding.models.PhoneAuth;
 import com.example.gelgel_short_time_coding.models.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class RegistrationActivity extends AppCompatActivity {
 
+    private static final String TAG = "RegistrationActivity";
     Button signUp;
     EditText name, email, password, phone;
     TextView signIn;
@@ -87,39 +92,30 @@ public class RegistrationActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
-                            // Create User
-                            auth.createUserWithEmailAndPassword(userEmail, userPassword)
-                                    .
 
-                                            addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                                    if (task.isSuccessful()) {
-                                                        UserModel userModel = new UserModel(userName, userEmail, userPassword, phoneNum);
-                                                        String id = task.getResult().getUser().getUid();
+                            UserModel userModel = new UserModel(userName, userEmail, userPassword, phoneNum);
+                            String id = auth.getUid();
 
-                                                        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+                            DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
 
-                                                        database.child("Users").child(id).setValue(userModel);
+                            database.child(id).setValue(userModel);
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("phone");
 
-                                                        progressBar.setVisibility(View.GONE);
+                            ref.child(phoneNum).setValue(new PhoneAuth(phoneNum, userPassword));
 
-                                                        Toast.makeText(RegistrationActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                            progressBar.setVisibility(View.GONE);
 
-                                                        startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
-                                                        finish();
-                                                    } else {
-                                                        progressBar.setVisibility(View.GONE);
-                                                        Toast.makeText(RegistrationActivity.this, "Error" + task.getException(), Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-                                            });
+                            Toast.makeText(RegistrationActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+
                             startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
                             dialog.dismiss();
                             finish();
                         } else {
-                            Log.e("MainActiv", "onComplete: " + task.getException().getLocalizedMessage());
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(RegistrationActivity.this, "Error" + task.getException(), Toast.LENGTH_SHORT).show();
                         }
+
+
                     }
                 });
     }
@@ -156,8 +152,9 @@ public class RegistrationActivity extends AppCompatActivity {
                                                 Toast.makeText(RegistrationActivity.this, "Empty Code", Toast.LENGTH_SHORT).show();
                                                 return;
                                             } else {
+
                                                 PhoneAuthCredential cred = PhoneAuthProvider.getCredential(verificationId, code);
-                                                signInUser(cred,userEmail, userPassword, userName, phoneNum);
+                                                signInUser(cred, userEmail, userPassword, userName, phoneNum);
                                             }
                                         }
                                     });
@@ -173,8 +170,18 @@ public class RegistrationActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onVerificationFailed(FirebaseException e) {
-                                    Toast.makeText(RegistrationActivity.this, "Failed to verify", Toast.LENGTH_SHORT).show();
+                                    // It is invoked when an invalid request is made for verification.                 //For instance, if the phone number format is not valid.
+                                    Log.w(TAG, "onVerificationFailed", e);
 
+
+                                    if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                        // Invalid request
+                                        // Setting error to text field
+                                        phone.setError("Invalid phone number.");
+                                    } else if (e instanceof FirebaseTooManyRequestsException) {
+                                        // The SMS quota has been exceeded for the project
+                                        Toast.makeText(getApplicationContext(), "Quota exceeded", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             })
                             .build();

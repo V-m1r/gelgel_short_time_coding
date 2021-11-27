@@ -21,8 +21,11 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -31,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
 
-    FirebaseDatabase database;
+    DatabaseReference database;
     FirebaseAuth auth;
 
 
@@ -58,32 +61,36 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         auth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance();
+        database = FirebaseDatabase.getInstance().getReference().child("Users").child(Objects.requireNonNull(auth.getUid()));
+
 
         View headerView = navigationView.getHeaderView(0);
         TextView headerName = headerView.findViewById(R.id.nav_header_name);
         TextView headerEmail = headerView.findViewById(R.id.nav_header_email);
         CircleImageView headerImg = headerView.findViewById(R.id.nav_header_img);
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                    UserModel userModel = dataSnapshot.getValue(UserModel.class);
+                    assert userModel != null;
+                    headerName.setText(userModel.getName());
+                    headerEmail.setText(userModel.getEmail());
+                    Glide.with(MainActivity.this).load(userModel.getProfileImg()).into(headerImg);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
-        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        UserModel userModel = snapshot.getValue(UserModel.class);
-
-                        headerName.setText(userModel.getName());
-                        headerEmail.setText(userModel.getEmail());
-                        Glide.with(MainActivity.this).load(userModel.getProfileImg()).into(headerImg);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
