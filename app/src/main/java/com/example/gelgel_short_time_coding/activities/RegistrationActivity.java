@@ -143,6 +143,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                     dialog = new Dialog(RegistrationActivity.this);
                                     dialog.setContentView(R.layout.verify_popup);
                                     EditText codeVer = dialog.findViewById(R.id.editTextNumberDecimalCode);
+                                    dialog.setCancelable(false);
                                     Button btnVerifyCode = dialog.findViewById(R.id.buttonCode);
                                     btnVerifyCode.setOnClickListener(new View.OnClickListener() {
                                         @Override

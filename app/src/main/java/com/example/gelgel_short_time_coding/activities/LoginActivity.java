@@ -105,24 +105,7 @@ private Dialog dialog;
             return;
         }
 
-        // Login User
-     /*   auth.signInWithEmailAndPassword(userNum, userPassword)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if (task.isSuccessful()) {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, "Login Succesfull", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } else {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, "Error" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });*/
 
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("phone").child(userNum);
@@ -148,6 +131,7 @@ private Dialog dialog;
                                             dialog = new Dialog(LoginActivity.this);
                                             dialog.setContentView(R.layout.verify_popup);
                                             EditText codeVer = dialog.findViewById(R.id.editTextNumberDecimalCode);
+                                          dialog.setCancelable(false);
                                             Button btnVerifyCode = dialog.findViewById(R.id.buttonCode);
                                             btnVerifyCode.setOnClickListener(new View.OnClickListener() {
                                                 @Override
