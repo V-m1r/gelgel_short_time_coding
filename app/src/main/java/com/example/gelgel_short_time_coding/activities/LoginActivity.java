@@ -3,6 +3,7 @@ package com.example.gelgel_short_time_coding.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,15 +20,22 @@ import com.example.gelgel_short_time_coding.R;
 import com.example.gelgel_short_time_coding.models.PhoneAuth;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -36,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView signUp;
 
     FirebaseAuth auth;
-
+private Dialog dialog;
     ProgressBar progressBar;
 
 
@@ -117,38 +125,115 @@ public class LoginActivity extends AppCompatActivity {
                 });*/
 
 
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("phone").child(userNum);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("phone").child(userNum);
 
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        PhoneAuth auth = snapshot.getValue(PhoneAuth.class);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(LoginActivity.this, "Phone num doesn't exist", Toast.LENGTH_SHORT).show();
 
-                        if (auth.getPassword().equals(userPassword)) {
-                            Log.e("Login", auth.getPassword()+" "+auth.getPhoneNum());
+                } else {
 
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, "Login Succesfull", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } else {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, "Password is incorrect", Toast.LENGTH_SHORT).show();
+                    PhoneAuthOptions options =
+                            PhoneAuthOptions.newBuilder(auth)
+                                    .setPhoneNumber(userNum)       // Phone number to verify
+                                    .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                                    .setActivity(LoginActivity.this)                 // Activity (for callback binding)
+                                    .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                                        @Override
+                                        public void onCodeSent(String verificationId,
+                                                               PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                                            dialog = new Dialog(LoginActivity.this);
+                                            dialog.setContentView(R.layout.verify_popup);
+                                            EditText codeVer = dialog.findViewById(R.id.editTextNumberDecimalCode);
+                                            Button btnVerifyCode = dialog.findViewById(R.id.buttonCode);
+                                            btnVerifyCode.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    String code = codeVer.getText().toString();
+                                                    if (code.isEmpty()) {
+                                                        Toast.makeText(LoginActivity.this, "Empty Code", Toast.LENGTH_SHORT).show();
+                                                        return;
+                                                    } else {
+                                                        PhoneAuth authPhone = snapshot.getValue(PhoneAuth.class);
+                                                        PhoneAuthCredential cred = PhoneAuthProvider.getCredential(verificationId, code);
+                                                        signInWithPhoneAuthCredential(cred, userPassword, authPhone.getPassword());
+                                                    }
+                                                }
+                                            });
+                                            dialog.show();
+                                        }
 
-                        }
-                    }else{
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(LoginActivity.this, "Phone num doesn't exist", Toast.LENGTH_SHORT).show();
 
-                    }
+                                        @Override
+                                        public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+                                            Toast.makeText(LoginActivity.this, "Sent code", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onVerificationFailed(FirebaseException e) {
+                                            // It is invoked when an invalid request is made for verification.                 //For instance, if the phone number format is not valid.
+                                            Log.w("Login", "onVerificationFailed", e);
+
+
+                                            if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                                // Invalid request
+                                                // Setting error to text field
+                                                num.setError("Invalid phone number.");
+                                            } else if (e instanceof FirebaseTooManyRequestsException) {
+                                                // The SMS quota has been exceeded for the project
+                                                Toast.makeText(getApplicationContext(), "Quota exceeded", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    })
+                                    .build();
+                    PhoneAuthProvider.verifyPhoneNumber(options);
+
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-        }
+            }
+        });
     }
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential, String passwordUser, String passwordFb) {
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener(LoginActivity
+                                .this,
+                        new OnCompleteListener<AuthResult>() {
+
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful() && passwordUser.equals(passwordFb)) {
+                                    //verification successful we will start the profile activity
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+
+                                }
+                                else if(!passwordFb.equals(passwordUser)){
+                                    Toast.makeText(LoginActivity.this,"Incorrect password", Toast.LENGTH_SHORT).show();
+
+                                }
+
+                                else {
+
+                                    //verification unsuccessful.. display an error message
+
+                                    String message = "Something is wrong, we will fix it soon...";
+
+                                    if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                        message = "Invalid code entered...";
+                                    }
+                                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+    }
+}
 
