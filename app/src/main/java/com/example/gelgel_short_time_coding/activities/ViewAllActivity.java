@@ -97,9 +97,9 @@ public class ViewAllActivity extends AppCompatActivity {
         }
 
 
-        //////Getting fish
-        if (type != null && type.equalsIgnoreCase("fish")){
-            firestore.collection("AllProducts").whereEqualTo("type", "fish").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        //////Getting shokolad
+        if (type != null && type.equalsIgnoreCase("shokolad")){
+            firestore.collection("AllProducts").whereEqualTo("type", "shokolad").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
@@ -114,9 +114,9 @@ public class ViewAllActivity extends AppCompatActivity {
                 }
             });
         }
-        //////Getting milk
-        if (type != null && type.equalsIgnoreCase("milk")){
-            firestore.collection("AllProducts").whereEqualTo("type", "milk").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        //////Getting milk_egg
+        if (type != null && type.equalsIgnoreCase("milk_egg")){
+            firestore.collection("AllProducts").whereEqualTo("type", "milk_egg").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
@@ -132,8 +132,8 @@ public class ViewAllActivity extends AppCompatActivity {
             });
         }
         //////Getting egg
-        if (type != null && type.equalsIgnoreCase("egg")){
-            firestore.collection("AllProducts").whereEqualTo("type", "egg").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        if (type != null && type.equalsIgnoreCase("cay_kofe")){
+            firestore.collection("AllProducts").whereEqualTo("type", "cay_kofe").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
@@ -148,6 +148,45 @@ public class ViewAllActivity extends AppCompatActivity {
                 }
             });
         }
+
+
+        //////Getting meat
+        if (type != null && type.equalsIgnoreCase("meat")){
+            firestore.collection("AllProducts").whereEqualTo("type", "meat").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    for (DocumentSnapshot documentSnapshot:task.getResult().getDocuments()){
+                        ViewAllModel viewAllModel = documentSnapshot.toObject(ViewAllModel.class);
+                        viewAllModelList.add(viewAllModel);
+                        viewAllAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        }
+
+        //////Getting drink
+        if (type != null && type.equalsIgnoreCase("drink")){
+            firestore.collection("AllProducts").whereEqualTo("type", "drink").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    for (DocumentSnapshot documentSnapshot:task.getResult().getDocuments()){
+                        ViewAllModel viewAllModel = documentSnapshot.toObject(ViewAllModel.class);
+                        viewAllModelList.add(viewAllModel);
+                        viewAllAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        }
+
+
     }
 
 

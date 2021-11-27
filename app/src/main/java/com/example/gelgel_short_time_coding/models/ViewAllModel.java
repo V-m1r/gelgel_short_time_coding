@@ -9,12 +9,12 @@ public class ViewAllModel implements Serializable {
     String rating;
     String img_url;
     String type;
-    int price;
+    double price;
 
     public ViewAllModel() {
     }
 
-    public ViewAllModel(String name, String description, String rating, String img_url, String type, int price) {
+    public ViewAllModel(String name, String description, String rating, String img_url, String type, double price) {
         this.name = name;
         this.description = description;
         this.rating = rating;
@@ -63,7 +63,7 @@ public class ViewAllModel implements Serializable {
         this.type = type;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 

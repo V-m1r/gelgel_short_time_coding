@@ -30,7 +30,7 @@ public class DetailedActivity extends AppCompatActivity {
 
     EditText quantity;
     int totalQuantity = 1;
-    int totalPrice = 0;
+    double totalPrice = 0;
 
     ImageView detailedImg;
     TextView price, rating, description;

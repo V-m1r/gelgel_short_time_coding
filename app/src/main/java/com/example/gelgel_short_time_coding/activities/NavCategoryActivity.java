@@ -129,5 +129,43 @@ public class NavCategoryActivity extends AppCompatActivity {
             });
         }
 
+        //////Getting cay_kofe
+        if (type != null && type.equalsIgnoreCase("cay_kofe")){
+            db.collection("NavCategoryDetailed").whereEqualTo("type", "cay_kofe").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    for (DocumentSnapshot documentSnapshot:task.getResult().getDocuments()){
+                        NavCategoryDetailedModels navCategoryDetailedModels = documentSnapshot.toObject(NavCategoryDetailedModels.class);
+                        list.add(navCategoryDetailedModels);
+                        adapter.notifyDataSetChanged();
+
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        }
+
+        //////Getting vegetable
+        if (type != null && type.equalsIgnoreCase("vegetable")){
+            db.collection("NavCategoryDetailed").whereEqualTo("type", "vegetable").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    for (DocumentSnapshot documentSnapshot:task.getResult().getDocuments()){
+                        NavCategoryDetailedModels navCategoryDetailedModels = documentSnapshot.toObject(NavCategoryDetailedModels.class);
+                        list.add(navCategoryDetailedModels);
+                        adapter.notifyDataSetChanged();
+
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        }
+
     }
 }

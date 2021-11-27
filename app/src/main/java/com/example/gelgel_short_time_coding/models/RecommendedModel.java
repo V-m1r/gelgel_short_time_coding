@@ -6,12 +6,12 @@ public class RecommendedModel {
     String description;
     String img_url;
     String rating;
-    int price;
+    double price;
 
     public RecommendedModel() {
     }
 
-    public RecommendedModel(String name, String descrption, String img_url, String rating, int price) {
+    public RecommendedModel(String name, String descrption, String img_url, String rating, double price) {
         this.name = name;
         this.description = descrption;
         this.img_url = img_url;
@@ -51,7 +51,7 @@ public class RecommendedModel {
         this.rating = rating;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
